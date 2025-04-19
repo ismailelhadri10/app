@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des examens</title>
+    <style>
+        .examen { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; }
+        .question { margin-left: 20px; }
+        .proposition-correcte { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Examens enregistrés</h1>
+    <div>
+        <input type="text" id="proprietaire" placeholder="Nom du propriétaire" required>
+        <button id="afficher">Afficher les examens</button>
+    </div>
+    <div id="resultat"></div>
+
+    <script>
+        document.getElementById('afficher').addEventListener('click', () => {
+            const prop = document.getElementById('proprietaire').value.trim();
+            if (!prop) {
+                alert('Veuillez entrer un nom de propriétaire');
+                return;
+            }
+            
+            const examsKey = 'examens_' + prop;
+            const exams = JSON.parse(localStorage.getItem(examsKey)) || [];
+            const container = document.getElementById('resultat');
+            container.innerHTML = '';
+            
+            if (exams.length === 0) {
+                container.innerHTML = '<p>Aucun examen trouvé pour ce propriétaire</p>';
+                return;
+            }
+            
+            exams.forEach(exam => {
+                const examDiv = document.createElement('div');
+                examDiv.className = 'examen';
+                
+                let questionsHTML = '<h3>Questions :</h3>';
+                if (exam.questions.length === 0) {
+                    questionsHTML += '<p>Aucune question pour cet examen</p>';
+                } else {
+                    questionsHTML += '<ol>';
+                    exam.questions.forEach(q => {
+                        let propositionsHTML = '<ul>';
+                        q.propositions.forEach(p => {
+                            const correctClass = p.correcte ? 'proposition-correcte' : '';
+                            propositionsHTML += `<li class="${correctClass}">${p.texte}</li>`;
+                        });
+                        propositionsHTML += '</ul>';
+                        
+                        questionsHTML += `
+                            <li class="question">
+                                <strong>${q.enonce}</strong>
+                                <p>Durée: ${q.duree}s - Points: ${q.points}</p>
+                                ${propositionsHTML}
+                            </li>
+                        `;
+                    });
+                    questionsHTML += '</ol>';
+                }
+                
+                examDiv.innerHTML = `
+                    <h2>${exam.nom} (${exam.duree} minutes)</h2>
+                    <p><em>${exam.description}</em></p>
+                    <p>Propriétaire: ${exam.proprietaire}</p>
+                    ${questionsHTML}
+                `;
+                
+                container.appendChild(examDiv);
+            });
+        });
+    </script>
+</body>
+</html>

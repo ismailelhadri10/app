@@ -29,10 +29,7 @@ document.getElementById('form-question').addEventListener('submit', function(e) 
     const propositions = [];
     const propositionElements = document.querySelectorAll('#propositions div');
     
-    if (propositionElements.length === 0) {
-        alert('Ajoutez au moins une proposition de réponse');
-        return;
-    }
+   
     
     propositionElements.forEach(div => {
         const texte = div.querySelector('input[type="text"]').value;
